@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 venv
 # C extensions
+.idea
 *.so
 
 # Distribution / packaging
