@@ -6,7 +6,9 @@ venv
 # C extensions
 .idea
 *.so
-
+*.db
+spectral_line.db/
+/src/path_to_db.txt
 # Distribution / packaging
 .Python
 build/
