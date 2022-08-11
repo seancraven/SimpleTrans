@@ -1,5 +1,5 @@
 """
-    File with plank function implementation that is convinient for this
+    File with plank function implementation that is convenient for this
     project.
 """
 import numpy as np
@@ -9,14 +9,16 @@ import scipy.constants as cst
 def plank(
     x, temperature: int, flux: bool = False, units="cm", is_wavelength=True
 ):
-    """Plank Function, wavelength or frequency
+    """
+    Plank Function, wavelength or frequency
     Args:
-        x: an array or list, in wavlength or frequency(nu)
-        Flux: Boolean Value for False returns radiance
+        x: an array or list, in wavelength or frequency(nu)
+        flux: Boolean Value for False returns radiance
         units: "cm", "m" or "um" where "um" are micrometers
-        is_wavelength: If true evaluates x in terms of wavelenth
-            else evalutes x in terms of frequency
-    Returns: returns all values in x evaluated with plank"""
+        is_wavelength: If true evaluates x in terms of wavelength
+            else evaluates x in terms of frequency
+    Returns:
+        returns all values in x evaluated with plank"""
     if is_wavelength:
         return plank_lambda(x, temperature, flux, units)
     else:
@@ -24,13 +26,15 @@ def plank(
 
 
 def plank_lambda(wavelength, temperature: int, flux=False, units="cm"):
-    """Plank Function as a function of Wavelength
+    """
+    Plank Function as a function of Wavelength
     Args:
-        x: an array or list, in wavlength
+        x: an array or list, in wavelength
         temperature: temperature in K
-        Flux: Boolean Value for False returns radiance
+        flux: Boolean Value for False returns radiance
         units: "cm", "m" or "um" where "um" are micrometers
-    Returns: returns all values in x evaluated with plank
+    Returns:
+        returns all values in x evaluated with plank
     """
     if units == "m":
         k = 1
@@ -55,13 +59,15 @@ def plank_lambda(wavelength, temperature: int, flux=False, units="cm"):
 
 
 def plank_nu(nu_, temperature: int, flux=False, units="cm"):
-    """Plank Function as a function of wavenumber
+    """
+    Plank Function as a function of wavenumber
     Args:
         nu_: an array or list, in wavenumber
         temperature: temperature in K
-        Flux: Boolean Value for False returns radiance
+        flux: Boolean Value for False returns radiance
         units: 1/ "cm", "m" or "um" where "um" are micrometers
-    Returns: returns all values in x evaluated with plank
+    Returns:
+        returns all values in x evaluated with plank
     """
     if units == "m":  ####These are inverse units
         k = 1
@@ -84,6 +90,4 @@ def plank_nu(nu_, temperature: int, flux=False, units="cm"):
         / (np.exp(c_2 * nu_ / temperature) - 1)
         * 10**6
     )
-
-
-#%%
+{

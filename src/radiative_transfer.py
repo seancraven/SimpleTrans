@@ -20,9 +20,7 @@ wave_no is short for wavenumber
 import os.path
 import sqlite3
 from typing import Tuple
-from numpy.typing import ArrayLike
 import isa
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from numpy.typing import ArrayLike
@@ -31,17 +29,25 @@ from tqdm import tqdm
 
 
 # %
-def default_db():
+def default_db() -> sqlite3.Connection:
+    """
+    Helper function to form connection to database maid in __main__.py.
+    If there is a problem it crashes.
+    Returns:
+        Database connection object.
+    """
     with open("./path_to_db.txt", "r") as f:
         path = f.read()
         if os.path.isfile(path):
             return sqlite3.connect(path)
         else:
-            print("""inspect path_to_db.txt, to ensure that the path is
+            print(
+                """inspect path_to_db.txt, to ensure that the path is
                 valid.
                 """
             )
             raise FileNotFoundError
+
 
 def fetch_od_from_db(
     connection: sqlite3.Connection,
@@ -52,7 +58,9 @@ def fetch_od_from_db(
 ) -> Tuple[dict[int:ArrayLike], ArrayLike]:
     """
     Returns a smoothed dict of optical depths, where the key is the
-    altitude.
+    altitude. From the optical depths database, which values are
+    calculated by the __main__.py file. Additionally returns the wavenumbers
+    associated with such optical depth OD(wavenumber_i).
 
     Only returns values in the intervals:
     [wave_no_min, wave_no_max], [alt_min, alt_max].
@@ -67,8 +75,8 @@ def fetch_od_from_db(
         gas: gas name, must be in database which was created.
         connection: Database Connection, with optical depths.
 
-
     Returns:
+        optical_depths dictionary, binned wavenumbers.
 
     """
     wave_no_min, wave_no_max = wave_no_range
@@ -102,18 +110,19 @@ def fetch_od_from_db(
     for alt in tqdm(alt_list, disable=disable_tdqm):
         mask = od_array[:, 0] == alt
         ods = od_array[mask]
-        binned_wave_nos, mean_ods = integer_bin_means(
-            ods[:, 1:]
-        )
+        binned_wave_nos, mean_ods = integer_bin_means(ods[:, 1], ods[:, 2])
         binned_wave_nos, mean_ods = coerce_sorted_key_value_pair_to_target(
-            binned_wave_nos, mean_ods,
-            np.arange(wave_no_min, wave_no_max + 1, dtype=int)
-            )
+            binned_wave_nos,
+            mean_ods,
+            np.arange(wave_no_min, wave_no_max + 1, dtype=int),
+        )
         od_dict.update({int(alt): mean_ods})
     return od_dict, binned_wave_nos
 
 
-def coerce_sorted_key_value_pair_to_target(a_1: ArrayLike, a_2: ArrayLike, target_array: ArrayLike):
+def coerce_sorted_key_value_pair_to_target(
+    a_1: ArrayLike, a_2: ArrayLike, target_array: ArrayLike
+):
     """
     If two arrays represent a key value pair, with a_1 the sorted keys and
     a_2 the values.
@@ -150,20 +159,33 @@ def coerce_sorted_key_value_pair_to_target(a_1: ArrayLike, a_2: ArrayLike, targe
     return a_12_array[0], a_12_array[1]
 
 
-def integer_bin_means(data: ArrayLike) -> Tuple[ArrayLike, ArrayLike]:
-    assert 2 in data.shape
-    if data.shape[0] != 2:
-        data = data.transpose()
-    int_bins = np.rint(data[0])
+def integer_bin_means(
+    column_0: ArrayLike, column_1: ArrayLike
+) -> Tuple[ArrayLike, ArrayLike]:
+    """
+    Assumes that column_0 is key in that the values in colum_1[i]
+    are associated with float key column_0[i].
+    The float keys are rounded to the nearest integer, all values
+    with the same integer key are averaged over.
+    Example:
+        column_1: [0.1,0.5,1.2] column_2: [1,3,5]
+        returns [0,1] [1,4]
+    Args:
+        column_0: Float Key to be binned.
+        column_1: Values to be averaged over.
+
+    Returns:
+        integer_keys, bin_mean_values
+
+    """
+    assert column_0.shape == column_1.shape
+    int_bins = np.rint(column_0)
     col_0_unique = np.unique(int_bins)
     means = np.zeros_like(col_0_unique)
     for i, value in np.ndenumerate(col_0_unique):
         mask = int_bins == value
-        means[i] = np.mean((data[1])[mask])
+        means[i] = np.mean((column_1)[mask])
     return col_0_unique, means
-
-
-
 
 
 class AtmosphereGrid:
@@ -173,7 +195,7 @@ class AtmosphereGrid:
         wave_no_range: Tuple[float, float],
         *gas: str,
         verbose=False,
-        db_connection: sqlite3.Connection=default_db(),
+        db_connection: sqlite3.Connection = default_db(),
     ):
         self.alt_min, self.alt_max = alt_range
         self.wave_no_min, self.wave_no_max = wave_no_range
@@ -186,7 +208,15 @@ class AtmosphereGrid:
             (len(self.alt_list), len(self.wave_no_bins))
         )
 
-    def get_optical_depth(self):
+    def get_optical_depth(self) -> tuple[ArrayLike, ArrayLike]:
+        """
+        calculates OD(wavenumber)
+        Function to add multiple optical depths together, when more than one gas is
+        passed to AtmospherGrid. Additionally returns the optical depth values for each integer wavenumber.
+        Returns:
+            total optical depth, wave number bins associated with the optical depth values.
+
+        """
         od_df = 0
         for _gas in self.gases:
             if self.verbose:
@@ -203,15 +233,32 @@ class AtmosphereGrid:
             od_df += pd.DataFrame(od_dict)
         return od_df, wave_no_bins
 
-    def get_blackbody_grid(self):
+    def get_blackbody_grid(self) -> ArrayLike:
+        """
+        When the atmosphere is treated as blocks, with an associated temperature,
+        such blocks emit thermal blackbody radiation. This function calculates
+        these black body values for the altitudes and wavenumbers in
+        AtmosphereGrid.
+
+        Returns:
+
+
+        """
         temp_list = isa.get_temperature([int(i) for i in self.alt_list])
         temp_grid = (self.ones_grid.transpose() * temp_list).transpose()
         wave_no_grid = self.ones_grid * self.wave_no_bins.transpose()
-        return plank_nu(wave_no_grid, temp_grid).transpose()
+        return plank_nu(wave_no_grid, temp_grid, flux=True).transpose()
 
-    def flux_up(self):
+    def flux_up(self) -> pd.DataFrame:
+        """
+        Calculates the total flux from the blackbody emission from both,
+        earth and its warm atmosphere with the transmission profiles of the
+        atmosphere due to the GHGs modelled.
+        Returns:
+
+        """
         ground_flux = plank_nu(
-            self.wave_no_bins, isa.get_temperature(self.alt_min)
+            self.wave_no_bins, isa.get_temperature(self.alt_min), flux=True
         )
         transmission_all_alt = np.exp(-self.od_df)
         blackbody_grid = self.get_blackbody_grid()
@@ -219,10 +266,9 @@ class AtmosphereGrid:
         flux_from_surf = pd.DataFrame(
             (transmission_all_alt.transpose() * ground_flux).transpose()
         )
-        flux_from_ith_block = (
-            transmission_all_alt * blackbody_grid
-        )  # wavenumber
-        # grid has spacing 1 cm^(-1) such that no multiplication is needed
+        flux_from_ith_block = transmission_all_alt * blackbody_grid
+        # wavenumber grid has spacing 1 cm^(-1) such that no
+        # multiplication is needed
         for i, _ in enumerate(flux_from_ith_block.iloc[0, :]):
             if i != 0:
                 flux_from_ith_block.iloc[:, i] += flux_from_ith_block.iloc[
@@ -233,14 +279,3 @@ class AtmosphereGrid:
                 ]
         total_flux = flux_from_surf + flux_from_ith_block
         return pd.DataFrame(total_flux, columns=self.od_df.columns)
-
-ag_test = AtmosphereGrid(
-    (0, 10000), (200, 4000), "H2O", "CO2", "CH4", "N2O", verbose=True
-)
-
-# %%
-
-up_flux = ag_test.flux_up()
-for i in up_flux:
-    plt.plot(ag_test.wave_no_bins, up_flux[i])
-plt.show()

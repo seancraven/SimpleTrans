@@ -13,10 +13,10 @@ def number_density(alt: float) -> float:
     assuming ideal gas.
 
     Args:
-        alt (float): Altitude in meters.
+        alt: Altitude in meters.
 
     Returns:
-        float: n(alt) in molecules/m^3
+        n(alt) in molecules/m^3
     """
     mass_of_air = (
         28.9647 * 10**-3 / constants.N_A
@@ -28,13 +28,14 @@ def particle_per_sq_m(alt_0: float, alt_1: float) -> float:
     """
     Returns number of particles per square meter
     between two altitudes
+    Performs a path integral betweeen the two altitudes.
 
     Args:
         alt_0 (float): altitude in meters.
         alt_1 (float): altitude in meters.
 
     Returns:
-        float:
+        particles per square meter.
     """
     return quad(number_density, alt_0, alt_1)[0]
 

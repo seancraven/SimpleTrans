@@ -2,6 +2,7 @@ import os
 import sys
 import isa
 from optical_depth_functions import optical_depth
+from numpy.typing import ArrayLike
 
 
 class HiddenPrints:
@@ -57,7 +58,9 @@ def ghg_lbl_download(path: str):
             )
 
 
-def ghg_od_calculate(gas: str, alt: float):
+def ghg_od_calculate(
+    gas: str, alt: float
+) -> tuple[ArrayLike, ArrayLike, ArrayLike]:
     """
     Calculates the optical density of a km of atmosphere, due to a
     single gas.
@@ -66,8 +69,8 @@ def ghg_od_calculate(gas: str, alt: float):
         gas (str): string of gas name, valid gasses found in Ghg.
         alt (float): midpoint altitude of km block of atmosphere.
 
-    Returns: (np.array, np.array): wavenumber and optical density arrays
-    of same shape.
+    Returns: (np.array, np.array): wavenumber,  optical density and
+     absorbtion coef arrays of same shape.
     """
     temp = isa.get_temperature(alt)
     pressure = isa.get_pressure(alt)
