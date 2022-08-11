@@ -1,6 +1,8 @@
 import os
 import sys
 import isa
+from optical_depth_functions import optical_depth
+
 
 class HiddenPrints:
     """Suppresses prints to console"""
@@ -44,7 +46,7 @@ def ghg_lbl_download(path: str):
     from in the ghg_od_calculate().
     """
     with HiddenPrints():
-        hapi.db_begin(os.path.join(path, "/spectral_line.db"))
+        hapi.db_begin(os.path.join(path, "spectral_line.db"))
         isotopologue = 1  # only want main isotopologue
         min_wavenumber = 0
         max_wavenumber = 4000  # spectral flux density

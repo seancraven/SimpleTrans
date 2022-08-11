@@ -16,14 +16,19 @@ import os
 from hapi_wrapper import *
 from database_interaction import *
 import sqlite3
-
+import numpy as np
+from tqdm import tqdm
 
 
 def main():
 
-    path = input("Path to store database")
+    path = input("Path to store database: ")
     if os.path.exists(path):
-        print("Populating 2 local databases")
+        print(
+            """Populating 2 local databases,
+            \n please be patient this takes a long time.
+        """
+        )
     else:
         print(
             path,
@@ -31,8 +36,9 @@ def main():
         ensure path is a directory that exists
         """,
         )
-    ghg_lbl_download()
-    conn = create_connection(os.path.join(path, "optical_depth.db"))
+    ghg_lbl_download(path)
+    database_name = "optical_depth.db"
+    conn = create_connection(os.path.join(path, database_name))
     # Use sqlite3 PRAGMA for faster loading
     pragma(conn)
     if conn is not None:
@@ -92,11 +98,11 @@ def main():
                         insert_query(
                             conn,
                             "optical_depths",
-                            _id,
-                            alt,
-                            nu,
-                            tau,
-                            coef,
+                            mol_id=_id,
+                            altitude=alt,
+                            wave_no=nu,
+                            optical_depth=tau,
+                            abs_coef=coef,
                         )
                     except sqlite3.IntegrityError:
                         query = column_comparison_query(
@@ -117,7 +123,9 @@ def main():
                             )
             else:
                 pass
-
-
+    absolute_path = os.path.abspath(path)
+    path_file = open(os.path.join(os.path.dirname(os.path.abspath(__file__)),"path_to_db.txt"),"a")
+    path_file.write(os.path.join(absolute_path, database_name))
+    path_file.close()
 if __name__ == "__main__":
     main()

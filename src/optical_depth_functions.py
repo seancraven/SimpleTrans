@@ -5,7 +5,7 @@
 import isa
 from scipy.integrate import quad
 from scipy import constants
-
+from typing import Any
 
 def number_density(alt: float) -> float:
     """

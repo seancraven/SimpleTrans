@@ -1,28 +1,7 @@
-import os
-import sys
-from typing import Any, Tuple
+from typing import Any
 import sqlite3
 from sqlite3 import Error
-import numpy as np
-from tqdm import tqdm
-import isa
-from optical_depth_functions import optical_depth
 
-
-class HiddenPrints:
-    """Suppresses prints to console"""
-
-    def __enter__(self):
-        self._original_stdout = sys.stdout
-        sys.stdout = open(os.devnull, "w")
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        sys.stdout.close()
-        sys.stdout = self._original_stdout
-
-
-with HiddenPrints():
-    import hapi
 
 
 def pragma(connection: sqlite3.Connection):
