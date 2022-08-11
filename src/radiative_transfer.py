@@ -66,20 +66,38 @@ def fetch_od_from_db(
     int_wave_no = np.rint(od_array[:, 1])
     od_dict = {}
     if verbose:
-        for alt in tqdm(alt_list):
-            mask = od_array[:, 0] == alt
-            ods = od_array[:, 2][mask]
-            wave_nos = int_wave_no[mask]
-            binned_wave_nos, mean_ods = integer_bin_means(np.vstack((wave_nos, ods)))
-            od_dict.update({int(alt): mean_ods})
+        disable_tdqm = False
     else:
-        for alt in alt_list:
-            mask = od_array[:, 0] == alt
-            ods = od_array[:, 2][mask]
-            wave_nos = int_wave_no[mask]
-            binned_wave_nos, mean_ods = integer_bin_means(np.vstack((wave_nos, ods)))
-            od_dict.update({int(alt): mean_ods})
+        disable_tdqm = True
+    for alt in tqdm(alt_list, disable=disable_tdqm):
+        mask = od_array[:, 0] == alt
+        ods = od_array[:, 2][mask]
+        wave_nos = int_wave_no[mask]
+        binned_wave_nos, mean_ods = integer_bin_means(np.vstack((wave_nos, ods)))
+        binned_wave_nos, mean_ods = pad_array_pair(
+            binned_wave_nos,
+            mean_ods,
+            np.arange(wave_no_min, wave_no_max + 1, dtype=int),
+        )
+        od_dict.update({int(alt): mean_ods})
     return od_dict, binned_wave_nos
+
+
+def pad_array_pair(a_1, a_2, a_1_target):
+    # pack a_1, a_2 together append the difference in the sets a_1, a_1_target
+    # in tuples
+    a_12_array = np.vstack((a_1, a_2))
+    target_is_superset = set(a_1_target) - set(a_1)
+    target_is_subset = set(a_1) - set(a_1_target)
+    if target_is_superset:
+        for entry in list(target_is_superset):
+            a_12_array = np.hstack((a_12_array, np.array([[entry], [0]])))
+        a_12_array = a_12_array[:, np.argsort(a_12_array[0])]
+    else:
+        for surplus_entry in target_is_subset:
+            index = np.argwhere(a_1 == surplus_entry)
+            a_12_array = np.delete(a_12_array, index, axis=1)
+    return a_12_array[0], a_12_array[1]
 
 
 def integer_bin_means(data: ArrayLike) -> Tuple[ArrayLike, ArrayLike]:
@@ -125,7 +143,7 @@ class AtmosphereGrid:
                 _gas,
                 (self.alt_min, self.alt_max),
                 (self.wave_no_min, self.wave_no_max),
-                verbose=self.verbose
+                verbose=self.verbose,
             )
             od_df += pd.DataFrame(od_dict)
         return od_df, wave_no_bins
@@ -160,14 +178,7 @@ conn = sqlite3.connect(
     "/home/sean/Documents/Work/CDS_book/database_utitlites/optical_depth.db"
 )
 ag_test = AtmosphereGrid(
-    (0, 10000),
-    (200, 4000),
-    conn,
-    "H2O",
-    "CO2",
-    "CH4",
-    "N2O",
-    verbose=True
+    (0, 10000), (200, 4000), conn, "H2O", "CO2", "CH4", "N2O", verbose=True
 )
 
 
