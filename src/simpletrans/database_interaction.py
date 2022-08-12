@@ -20,7 +20,7 @@ class HiddenPrints:
         sys.stdout = self._original_stdout
 
 
-with HiddenPrints:
+with HiddenPrints():
     import hapi
 
 
