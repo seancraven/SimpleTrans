@@ -20,33 +20,16 @@ wave_no is short for wavenumber
 import os.path
 import sqlite3
 from typing import Tuple
-import isa
+from simpletrans import isa
 import numpy as np
 import pandas as pd
 from numpy.typing import ArrayLike
-from plank import plank_nu
+from simpletrans.plank import plank_nu
 from tqdm import tqdm
-
+from simpletrans.database_interacton import default_db
 
 # %
-def default_db() -> sqlite3.Connection:
-    """
-    Helper function to form connection to database maid in __main__.py.
-    If there is a problem it crashes.
-    Returns:
-        Database connection object.
-    """
-    with open("./path_to_db.txt", "r") as f:
-        path = f.read()
-        if os.path.isfile(path):
-            return sqlite3.connect(path)
-        else:
-            print(
-                """inspect path_to_db.txt, to ensure that the path is
-                valid.
-                """
-            )
-            raise FileNotFoundError
+
 
 
 def fetch_od_from_db(

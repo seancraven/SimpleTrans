@@ -2,7 +2,7 @@
     File to store basic functions for atmospheric calculations. Mostly
     used in calculate_absorbtion_coef_ghg.py.
 """
-import isa
+from simpletrans import isa
 from scipy.integrate import quad
 from scipy import constants
 from typing import Any

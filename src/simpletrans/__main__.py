@@ -13,8 +13,8 @@
     weblink.
 """
 import os
-from hapi_wrapper import *
-from database_interaction import *
+from simpletrans.hapi_wrapper import *
+from simpletrans.database_interaction import *
 import sqlite3
 import numpy as np
 from tqdm import tqdm
@@ -124,7 +124,11 @@ def main():
             else:
                 pass
     absolute_path = os.path.abspath(path)
-    path_file = open(os.path.join(os.path.dirname(os.path.abspath(__file__)),"path_to_db.txt"),"a")
+    path_file = open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+
+
+                                  "path_to_db.txt"
+                                  ), "a")
     path_file.write(os.path.join(absolute_path, database_name))
     path_file.close()
 if __name__ == "__main__":

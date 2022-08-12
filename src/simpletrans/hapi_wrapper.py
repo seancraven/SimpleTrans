@@ -1,7 +1,7 @@
 import os
 import sys
-import isa
-from optical_depth_functions import optical_depth
+from simpletrans import isa
+from simpletrans.optical_depth_functions import optical_depth
 from numpy.typing import ArrayLike
 
 
@@ -59,19 +59,23 @@ def ghg_lbl_download(path: str):
 
 
 def ghg_od_calculate(
-    gas: str, alt: float
+    gas: str, alt: float, ghg_ppm=None
 ) -> tuple[ArrayLike, ArrayLike, ArrayLike]:
     """
     Calculates the optical density of a km of atmosphere, due to a
     single gas.
 
     Args:
+        ghg_ppm: If the gas was not in the origional databse CO2, N2O,
+        H2O, CH4, this is required to calculate od.
         gas (str): string of gas name, valid gasses found in Ghg.
         alt (float): midpoint altitude of km block of atmosphere.
 
     Returns: (np.array, np.array): wavenumber,  optical density and
      absorbtion coef arrays of same shape.
     """
+    if not ghg_ppm:
+        ghg_ppm = Ghg.ppm[gas]
     temp = isa.get_temperature(alt)
     pressure = isa.get_pressure(alt)
     press_0 = isa.get_pressure(0)
@@ -82,5 +86,5 @@ def ghg_od_calculate(
             Diluent={"air": 1.0},
         )
 
-        od = optical_depth(alt - 500, alt + 500, Ghg.ppm[gas], coef)
+        od = optical_depth(alt - 500, alt + 500, ghg_ppm, coef)
     return nu, od, coef

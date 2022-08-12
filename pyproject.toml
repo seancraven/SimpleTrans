@@ -18,6 +18,7 @@ dependencies = [
     "hitran-api >= 1.2.2.0",
     "tqdm >= 4.64.0",
     "scipy >= 1.9.0",
+    "pandas >= 1.4.3",
 ]
 requires-python = ">=3.9"
 
@@ -28,8 +29,14 @@ dev = ["black", "bumpver", "isort", "pip-tools", "pytest"]
 Homepage = "https://seancraven.github.io/CDS_book/"
 Github = "https://seancraven.github.io/CDS_book/"
 
+[options]
+package_dir = "src"
+
+[options.packages.find]
+where = "src"
+
 [project.scripts]
-simpletrans = "__main__:main"
+simpletrans = "simpletrans.__main__:main"
 [tool.bumpver]
 current_version = "0.0.1"
 version_pattern = "MAJOR.MINOR.PATCH"
@@ -43,4 +50,4 @@ push = false
     'current_version = "{version}"', 'version = "{version}"'
 ]
 
-"src/__init__.py" = ["{version}"]
+"src/simpletrans/__init__.py" = ["{version}"]

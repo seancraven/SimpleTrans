@@ -8,7 +8,7 @@ venv
 *.so
 *.db
 spectral_line.db/
-/src/path_to_db.txt
+/src/simpletrans/path_to_db.txt
 # Distribution / packaging
 .Python
 build/
