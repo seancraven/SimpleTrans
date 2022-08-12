@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "SimpleTrans"
-version = "0.0.1"
+version = "0.1.0"
 description = "Simple atmosphere model, solving the Two stream equation on a grid."
 readme = "README.md"
 authors = [{ name = "Sean Craven", email = "seanpietercraven@gmail.com  " }]
@@ -38,7 +38,7 @@ where = "src"
 [project.scripts]
 simpletrans = "simpletrans.__main__:main"
 [tool.bumpver]
-current_version = "0.0.1"
+current_version = "0.1.0"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message = "bump version {old_version} -> {new_version}"
 commit = true
