@@ -1,0 +1,45 @@
+[build-system]
+requires      = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "SimpleTrans"
+version = "0.0.0"
+description = "Simple atmosphere model, solving the Two stream equation on a grid."
+readme = "README.md"
+authors = [{ name = "Sean Craven", email = "seanpietercraven@gmail.com  " }]
+license = { file = "LICENSE" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+keywords = ["radiation", "model", "learning"]
+dependencies = [
+    "numpy >= 1.23.1",
+    "hitran-api >= 1.2.2.0",
+    "tqdm >= 4.64.0",
+    "scipy >= 1.9.0",
+]
+requires-python = ">=3.9"
+
+[project.optional-dependencies]
+dev = ["black", "bumpver", "isort", "pip-tools", "pytest"]
+
+[project.urls]
+Homepage = "https://seancraven.github.io/CDS_book/"
+Github = "https://seancraven.github.io/CDS_book/"
+
+[project.scripts]
+simpletrans = "__main__:main"
+[tool.bumpver]
+current_version = "2022.1001-alpha"
+version_pattern = "YYYY.BUILD[-TAG]"
+commit_message = "bump version {old_version} -> {new_version}"
+commit = true
+tag = true
+push = true
+
+[tool.bumpver.file_patterns]
+"pyproject.toml" = [
+    'current_version = "{version}"',
+]
+
