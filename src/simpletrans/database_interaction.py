@@ -145,7 +145,7 @@ def default_db() -> sqlite3.Connection:
     Returns:
         Database connection object.
     """
-    with open("path_to_db.txt", "r") as f:
+    with open("./path_to_db.txt", "r") as f:
         path = f.read()
         if os.path.isfile(path):
             return sqlite3.connect(path)
@@ -158,7 +158,9 @@ def default_db() -> sqlite3.Connection:
             raise FileNotFoundError
 
 
-def add_gas(mol_name, mol_id, mol_ppm, connection=default_db()):
+def add_gas(mol_name, mol_id, mol_ppm, connection=None):
+    if not connection:
+        connection=default_db()
     try:
         insert_query(
             connection,

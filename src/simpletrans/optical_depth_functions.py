@@ -56,7 +56,7 @@ def optical_depth(
     Returns:
         np.array: optical depth of gas between two altitudes
     """
-    particles = particle_per_sq_m(alt_0, alt_1) * ppm_conc * 10 ** (-9)
+    particles = particle_per_sq_m(alt_0, alt_1) * ppm_conc * 10 ** (-6)
     return (
         particles * abs_coef * 10 ** (-4)
     )  # 10^-4 factor from cm^2->m^2 conv

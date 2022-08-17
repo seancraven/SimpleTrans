@@ -31,7 +31,7 @@ class Ghg:
     better than 1k accuracy on thermal brightness temperature.
     """
 
-    ppm = {"CO2": 411 * 1000, "CH4": 1893, "N2O": 327, "H2O": 25 * 10**6}
+    ppm = {"CO2": 411, "CH4": 1.893, "N2O": .327, "H2O": 25 * 10**9}
     ids = {"CO2": 2, "CH4": 6, "N2O": 4, "H2O": 1}
 
 

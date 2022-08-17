@@ -45,9 +45,12 @@ commit = true
 tag = true
 push = false
 
+
 [tool.bumpver.file_patterns]
 "pyproject.toml" = [
     'current_version = "{version}"', 'version = "{version}"'
 ]
 
 "src/simpletrans/__init__.py" = ["{version}"]
+[metadata]
+long_description = "file: README.md"
