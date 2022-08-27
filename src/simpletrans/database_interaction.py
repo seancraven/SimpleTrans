@@ -145,7 +145,8 @@ def default_db() -> sqlite3.Connection:
     Returns:
         Database connection object.
     """
-    with open("./path_to_db.txt", "r") as f:
+    parent_dir = os.path.dirname(os.path.abspath(__file__))
+    with open(os.path.join(parent_dir, "path_to_db.txt"), "r") as f:
         path = f.read()
         if os.path.isfile(path):
             return sqlite3.connect(path)

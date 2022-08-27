@@ -125,10 +125,7 @@ def main():
                 pass
     absolute_path = os.path.abspath(path)
     path_file = open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
-
-
-                                  "path_to_db.txt"
-                                  ), "a")
+ "path_to_db.txt"), "w")
     path_file.write(os.path.join(absolute_path, database_name))
     path_file.close()
 if __name__ == "__main__":

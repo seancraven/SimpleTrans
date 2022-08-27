@@ -26,7 +26,7 @@ import pandas as pd
 from numpy.typing import ArrayLike
 from simpletrans.plank import plank_nu
 from tqdm import tqdm
-from simpletrans.database_interacton import default_db
+from simpletrans.database_interaction import default_db
 
 # %
 

@@ -90,4 +90,4 @@ def plank_nu(nu_, temperature: int, flux=False, units="cm"):
         / (np.exp(c_2 * nu_ / temperature) - 1)
         * 10**6
     )
-{
+
